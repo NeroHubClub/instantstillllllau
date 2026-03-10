@@ -1,445 +1,794 @@
 local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
+local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
-local RunService = game:GetService("RunService")
+local StarterGui = game:GetService("StarterGui")
 
-local Player = Players.LocalPlayer
-local PlayerGui = Player:WaitForChild("PlayerGui")
+local plr = Players.LocalPlayer
 
-local ScreenGui = Instance.new("ScreenGui")
-local MainFrame = Instance.new("Frame")
-local MinimizedFrame = Instance.new("Frame")
-local MinimizedButton = Instance.new("TextButton")
-local MinimizeButton = Instance.new("TextButton")
-local Title = Instance.new("TextLabel")
-local Creator = Instance.new("TextLabel")
-local FreezeTradeButton = Instance.new("TextButton")
-local AutoReadyButton = Instance.new("TextButton")
-local ConsoleLog = Instance.new("ScrollingFrame")
-local ConsoleText = Instance.new("TextLabel")
+-- Create main GUI
+local gui = Instance.new("ScreenGui")
+gui.Name = "SimpleHub_" .. math.random(1000, 9999)
+gui.Parent = CoreGui
+gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+gui.ResetOnSpawn = false
+gui.DisplayOrder = 999
 
-ScreenGui.Name = "FreezeTradeGUI"
-ScreenGui.Parent = PlayerGui
-ScreenGui.ResetOnSpawn = false
-ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-
--- Minimized Frame (icon when minimized) - Draggable
-MinimizedFrame.Name = "MinimizedFrame"
-MinimizedFrame.Parent = ScreenGui
-MinimizedFrame.BackgroundColor3 = Color3.fromRGB(10, 15, 25)
-MinimizedFrame.BackgroundTransparency = 0.15
-MinimizedFrame.BorderSizePixel = 0
-MinimizedFrame.Position = UDim2.new(0.5, -25, 0.5, -25)
-MinimizedFrame.Size = UDim2.new(0, 50, 0, 50)
-MinimizedFrame.Active = true
-MinimizedFrame.Draggable = true
-MinimizedFrame.Visible = false
-
-local MinimizedCorner = Instance.new("UICorner")
-MinimizedCorner.CornerRadius = UDim.new(0, 10)
-MinimizedCorner.Parent = MinimizedFrame
-
-local MinimizedStroke = Instance.new("UIStroke")
-MinimizedStroke.Color = Color3.fromRGB(40, 50, 70)
-MinimizedStroke.Thickness = 1
-MinimizedStroke.Transparency = 0.5
-MinimizedStroke.Parent = MinimizedFrame
-
-MinimizedButton.Name = "MinimizedButton"
-MinimizedButton.Parent = MinimizedFrame
-MinimizedButton.BackgroundColor3 = Color3.fromRGB(50, 130, 255)
-MinimizedButton.BackgroundTransparency = 0.5
-MinimizedButton.Position = UDim2.new(0, 5, 0, 5)
-MinimizedButton.Size = UDim2.new(1, -10, 1, -10)
-MinimizedButton.Font = Enum.Font.GothamBold
-MinimizedButton.Text = "FT"
-MinimizedButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-MinimizedButton.TextSize = 16
-MinimizedButton.AutoButtonColor = false
-
-local MinimizedButtonCorner = Instance.new("UICorner")
-MinimizedButtonCorner.CornerRadius = UDim.new(0, 8)
-MinimizedButtonCorner.Parent = MinimizedButton
-
--- Main Frame (full UI) - Centered on execute
-MainFrame.Name = "MainFrame"
-MainFrame.Parent = ScreenGui
-MainFrame.BackgroundColor3 = Color3.fromRGB(10, 15, 25)
-MainFrame.BackgroundTransparency = 0.15
-MainFrame.BorderSizePixel = 0
-MainFrame.Position = UDim2.new(0.5, -80, 0.5, -80)
-MainFrame.Size = UDim2.new(0, 160, 0, 160)
-MainFrame.Active = true
-MainFrame.Draggable = true
-
-local UICorner = Instance.new("UICorner")
-UICorner.CornerRadius = UDim.new(0, 12)
-UICorner.Parent = MainFrame
-
-local UIStroke = Instance.new("UIStroke")
-UIStroke.Color = Color3.fromRGB(40, 50, 70)
-UIStroke.Thickness = 1
-UIStroke.Transparency = 0.5
-UIStroke.Parent = MainFrame
-
--- Minimize Button
-MinimizeButton.Name = "MinimizeButton"
-MinimizeButton.Parent = MainFrame
-MinimizeButton.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
-MinimizeButton.Position = UDim2.new(1, -18, 0, 4)
-MinimizeButton.Size = UDim2.new(0, 14, 0, 14)
-MinimizeButton.Font = Enum.Font.GothamBold
-MinimizeButton.Text = "−"
-MinimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-MinimizeButton.TextSize = 12
-MinimizeButton.AutoButtonColor = false
-MinimizeButton.ZIndex = 10
-
-local MinimizeButtonCorner = Instance.new("UICorner")
-MinimizeButtonCorner.CornerRadius = UDim.new(0, 4)
-MinimizeButtonCorner.Parent = MinimizeButton
-
--- Title (Centered)
-Title.Name = "Title"
-Title.Parent = MainFrame
-Title.BackgroundTransparency = 1
-Title.Position = UDim2.new(0, 0, 0, 4)
-Title.Size = UDim2.new(1, -18, 0, 12)
-Title.Font = Enum.Font.GothamBold
-Title.Text = "FREEZE TRADE"
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.TextSize = 10
-Title.TextXAlignment = Enum.TextXAlignment.Center
-
--- Creator (Centered)
-Creator.Name = "Creator"
-Creator.Parent = MainFrame
-Creator.BackgroundTransparency = 1
-Creator.Position = UDim2.new(0, 0, 0, 16)
-Creator.Size = UDim2.new(1, 0, 0, 10)
-Creator.Font = Enum.Font.Gotham
-Creator.Text = "Creator: Nero"
-Creator.TextColor3 = Color3.fromRGB(130, 140, 160)
-Creator.TextSize = 7
-Creator.TextXAlignment = Enum.TextXAlignment.Center
-
-FreezeTradeButton.Name = "FreezeTradeButton"
-FreezeTradeButton.Parent = MainFrame
-FreezeTradeButton.BackgroundColor3 = Color3.fromRGB(50, 130, 255)
-FreezeTradeButton.Position = UDim2.new(0, 8, 0, 30)
-FreezeTradeButton.Size = UDim2.new(1, -16, 0, 22)
-FreezeTradeButton.Font = Enum.Font.GothamBold
-FreezeTradeButton.Text = "Freeze Trade"
-FreezeTradeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-FreezeTradeButton.TextSize = 8
-FreezeTradeButton.AutoButtonColor = false
-
-local FreezeButtonCorner = Instance.new("UICorner")
-FreezeButtonCorner.CornerRadius = UDim.new(0, 6)
-FreezeButtonCorner.Parent = FreezeTradeButton
-
-AutoReadyButton.Name = "AutoReadyButton"
-AutoReadyButton.Parent = MainFrame
-AutoReadyButton.BackgroundColor3 = Color3.fromRGB(50, 130, 255)
-AutoReadyButton.Position = UDim2.new(0, 8, 0, 56)
-AutoReadyButton.Size = UDim2.new(1, -16, 0, 22)
-AutoReadyButton.Font = Enum.Font.GothamBold
-AutoReadyButton.Text = "Auto - Ready"
-AutoReadyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-AutoReadyButton.TextSize = 8
-AutoReadyButton.AutoButtonColor = false
-
-local AutoReadyButtonCorner = Instance.new("UICorner")
-AutoReadyButtonCorner.CornerRadius = UDim.new(0, 6)
-AutoReadyButtonCorner.Parent = AutoReadyButton
-
-ConsoleLog.Name = "ConsoleLog"
-ConsoleLog.Parent = MainFrame
-ConsoleLog.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-ConsoleLog.BackgroundTransparency = 0.6
-ConsoleLog.BorderSizePixel = 0
-ConsoleLog.Position = UDim2.new(0, 8, 0, 86)
-ConsoleLog.Size = UDim2.new(1, -16, 0, 60)
-ConsoleLog.CanvasSize = UDim2.new(0, 0, 0, 0)
-ConsoleLog.ScrollBarThickness = 0
-ConsoleLog.ScrollingEnabled = false
-ConsoleLog.ClipsDescendants = true
-
-local LogCorner = Instance.new("UICorner")
-LogCorner.CornerRadius = UDim.new(0, 6)
-LogCorner.Parent = ConsoleLog
-
-ConsoleText.Name = "ConsoleText"
-ConsoleText.Parent = ConsoleLog
-ConsoleText.BackgroundTransparency = 1
-ConsoleText.Position = UDim2.new(0, 4, 0, 2)
-ConsoleText.Size = UDim2.new(1, -8, 0, 0)
-ConsoleText.Font = Enum.Font.Code
-ConsoleText.Text = ""
-ConsoleText.TextColor3 = Color3.fromRGB(200, 210, 220)
-ConsoleText.TextSize = 6
-ConsoleText.TextXAlignment = Enum.TextXAlignment.Left
-ConsoleText.TextYAlignment = Enum.TextYAlignment.Top
-ConsoleText.RichText = true
-ConsoleText.TextWrapped = true
-
-local LogMessages = {}
-local isAutoReadyRunning = false
-local autoReadyConnection = nil
-
-local function AddLog(message, color)
-	table.insert(LogMessages, {text = message, color = color or Color3.fromRGB(100, 255, 150)})
-
-	local visibleMessages = {}
-	local startIndex = math.max(1, #LogMessages - 4)
-
-	for i = startIndex, #LogMessages do
-		table.insert(visibleMessages, LogMessages[i])
-	end
-
-	local logText = ""
-	for i, log in ipairs(visibleMessages) do
-		local r, g, b = math.floor(log.color.R * 255), math.floor(log.color.G * 255), math.floor(log.color.B * 255)
-		logText = logText .. string.format('<font color="rgb(%d,%d,%d)">%s</font>\n', r, g, b, log.text)
-	end
-
-	ConsoleText.Text = logText
-end
-
--- Auto-Ready messages for rapid sequence
-local autoReadyRapidMessages = {
-	"Scanning trade...",
-	"Trade found!",
-	"Analyzing...",
-	"P1: READY",
-	"P2: NOT READY",
-	"Waiting P2...",
-	"Auto-ready on",
-	"Setting ready...",
-	"Ready locked",
-	"Anti-delay on",
-	"Monitoring...",
-	"Timer: 30s",
-	"Both ready!",
-	"Proceed trade",
-	"Confirming...",
-	"Trade accepted",
-	"Processing...",
-	"Items verified",
-	"Complete!",
-	"New trade",
-	"Repeating...",
-	"Maintaining",
-	"Ready status",
-	"Waiting...",
-	"System ready"
+-- Colors
+local colors = {
+	bg = Color3.fromRGB(20, 20, 26),
+	header = Color3.fromRGB(16, 16, 22),
+	accent = Color3.fromRGB(0, 210, 220),
+	text = Color3.fromRGB(255, 255, 255),
+	gold = Color3.fromRGB(255, 200, 0),
+	tabInactive = Color3.fromRGB(30, 30, 40),
+	tabActive = Color3.fromRGB(45, 45, 55),
+	green = Color3.fromRGB(0, 255, 100),
+	switchOff = Color3.fromRGB(60, 60, 70),
+	switchOn = Color3.fromRGB(0, 150, 200),
+	thumb = Color3.fromRGB(255, 255, 255),
+	note = Color3.fromRGB(200, 200, 200)
 }
 
--- Auto-Accept messages
-local autoAcceptMessages = {
-	"Auto-Accept start",
-	"Monitoring...",
-	"Trade detected",
-	"Analyzing offer",
-	"Items: 4",
-	"Value: HIGH",
-	"Accept started",
-	"Bypassing...",
-	"Window accessed",
-	"Clicking accept",
-	"Accept sent",
-	"Waiting...",
-	"Partner accept!",
-	"Transferring...",
-	"Item 1 done",
-	"Item 2 done",
-	"Item 3 done",
-	"Item 4 done",
-	"Trade done!",
-	"Items received",
-	"Verifying...",
-	"All confirmed",
-	"Success!"
-}
+-- Main window
+local window = Instance.new("Frame")
+window.Size = UDim2.new(0, 500, 0, 420)  -- Increased height to fit user panel
+window.Position = UDim2.new(0.5, -250, 0.5, -210)
+window.BackgroundColor3 = colors.bg
+window.BorderSizePixel = 0
+window.Parent = gui
 
--- Minimize/Restore functions
-local function MinimizeUI()
-	MainFrame.Visible = false
-	MinimizedFrame.Visible = true
-end
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 10)
+corner.Parent = window
 
-local function RestoreUI()
-	MinimizedFrame.Visible = false
-	MainFrame.Visible = true
-end
+-- Header
+local header = Instance.new("Frame")
+header.Size = UDim2.new(1, 0, 0, 50)
+header.BackgroundColor3 = colors.header
+header.BorderSizePixel = 0
+header.Parent = window
 
--- Minimize button click
-MinimizeButton.MouseButton1Click:Connect(MinimizeUI)
+local headerCorner = Instance.new("UICorner")
+headerCorner.CornerRadius = UDim.new(0, 10)
+headerCorner.Parent = header
 
--- Minimized button click (restore)
-MinimizedButton.MouseButton1Click:Connect(RestoreUI)
+-- Title
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, -40, 0, 25)
+title.Position = UDim2.new(0, 10, 0, 5)
+title.BackgroundTransparency = 1
+title.Text = "Steal A Brainrots | Freeze Trade | v2.1"
+title.TextColor3 = colors.text
+title.Font = Enum.Font.GothamBold
+title.TextSize = 16
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = header
 
--- Hover effects for minimize button
-MinimizeButton.MouseEnter:Connect(function()
-	TweenService:Create(MinimizeButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(255, 100, 100)}):Play()
+-- Author credit
+local author = Instance.new("TextLabel")
+author.Size = UDim2.new(1, -40, 0, 15)
+author.Position = UDim2.new(0, 10, 0, 28)
+author.BackgroundTransparency = 1
+author.Text = "By: Nero"
+author.TextColor3 = Color3.fromRGB(180, 180, 180)
+author.Font = Enum.Font.Gotham
+author.TextSize = 12
+author.TextXAlignment = Enum.TextXAlignment.Left
+author.Parent = header
+
+-- Hide button
+local hideBtn = Instance.new("TextButton")
+hideBtn.Size = UDim2.new(0, 25, 0, 25)
+hideBtn.Position = UDim2.new(1, -30, 0.5, -12.5)
+hideBtn.BackgroundColor3 = colors.header
+hideBtn.Text = "−"
+hideBtn.TextColor3 = colors.text
+hideBtn.Font = Enum.Font.GothamBold
+hideBtn.TextSize = 18
+hideBtn.BorderSizePixel = 0
+hideBtn.Parent = header
+
+local btnCorner = Instance.new("UICorner")
+btnCorner.CornerRadius = UDim.new(0, 6)
+btnCorner.Parent = hideBtn
+
+-- Main content area
+local mainArea = Instance.new("Frame")
+mainArea.Size = UDim2.new(1, -20, 1, -65)
+mainArea.Position = UDim2.new(0, 10, 0, 55)
+mainArea.BackgroundTransparency = 1
+mainArea.Parent = window
+
+-- ========== LEFT PANEL (Content + Status Bar) ==========
+local leftPanel = Instance.new("Frame")
+leftPanel.Size = UDim2.new(0, 340, 1, 0)
+leftPanel.Position = UDim2.new(0, 0, 0, 0)
+leftPanel.BackgroundTransparency = 1
+leftPanel.Parent = mainArea
+
+local contentContainer = Instance.new("Frame")
+contentContainer.Size = UDim2.new(1, 0, 1, -45)
+contentContainer.Position = UDim2.new(0, 0, 0, 0)
+contentContainer.BackgroundTransparency = 1
+contentContainer.Parent = leftPanel
+
+local tradeFrame = Instance.new("Frame")
+tradeFrame.Size = UDim2.new(1, 0, 1, 0)
+tradeFrame.BackgroundTransparency = 1
+tradeFrame.Visible = true
+tradeFrame.Parent = contentContainer
+
+local historyFrame = Instance.new("Frame")
+historyFrame.Size = UDim2.new(1, 0, 1, 0)
+historyFrame.BackgroundTransparency = 1
+historyFrame.Visible = false
+historyFrame.Parent = contentContainer
+
+-- Status bar
+local statusBar = Instance.new("Frame")
+statusBar.Size = UDim2.new(1, 0, 0, 40)
+statusBar.Position = UDim2.new(0, 0, 1, -40)
+statusBar.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+statusBar.Parent = leftPanel
+
+local statusCorner = Instance.new("UICorner")
+statusCorner.CornerRadius = UDim.new(0, 8)
+statusCorner.Parent = statusBar
+
+local circle = Instance.new("Frame")
+circle.Size = UDim2.new(0, 10, 0, 10)
+circle.Position = UDim2.new(0, 10, 0.5, -5)
+circle.BackgroundColor3 = colors.green
+circle.BorderSizePixel = 0
+circle.Parent = statusBar
+
+local circleCorner = Instance.new("UICorner")
+circleCorner.CornerRadius = UDim.new(1, 0)
+circleCorner.Parent = circle
+
+local activeLabel = Instance.new("TextLabel")
+activeLabel.Size = UDim2.new(0, 80, 1, 0)
+activeLabel.Position = UDim2.new(0, 25, 0, 0)
+activeLabel.BackgroundTransparency = 1
+activeLabel.Text = "Active Now"
+activeLabel.TextColor3 = colors.green
+activeLabel.Font = Enum.Font.GothamBold
+activeLabel.TextSize = 14
+activeLabel.TextXAlignment = Enum.TextXAlignment.Left
+activeLabel.Parent = statusBar
+
+local counterLabel = Instance.new("TextLabel")
+counterLabel.Size = UDim2.new(0, 50, 1, 0)
+counterLabel.Position = UDim2.new(0, 105, 0, 0)
+counterLabel.BackgroundTransparency = 1
+counterLabel.Text = "2.1k"
+counterLabel.TextColor3 = colors.text
+counterLabel.Font = Enum.Font.GothamBold
+counterLabel.TextSize = 16
+counterLabel.TextXAlignment = Enum.TextXAlignment.Left
+counterLabel.Parent = statusBar
+
+-- ========== RIGHT PANEL (Vertical Tabs + User Info) ==========
+local rightPanel = Instance.new("Frame")
+rightPanel.Size = UDim2.new(0, 120, 1, 0)
+rightPanel.Position = UDim2.new(1, -120, 0, 0)
+rightPanel.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+rightPanel.Parent = mainArea
+
+local rightCorner = Instance.new("UICorner")
+rightCorner.CornerRadius = UDim.new(0, 8)
+rightCorner.Parent = rightPanel
+
+-- Trade tab
+local tradeTab = Instance.new("TextButton")
+tradeTab.Size = UDim2.new(1, -20, 0, 45)
+tradeTab.Position = UDim2.new(0, 10, 0, 15)
+tradeTab.BackgroundColor3 = colors.tabActive
+tradeTab.Text = "Trade"
+tradeTab.TextColor3 = colors.text
+tradeTab.Font = Enum.Font.GothamBold
+tradeTab.TextSize = 16
+tradeTab.BorderSizePixel = 0
+tradeTab.Parent = rightPanel
+
+local tabCorner = Instance.new("UICorner")
+tabCorner.CornerRadius = UDim.new(0, 8)
+tabCorner.Parent = tradeTab
+
+-- History tab
+local historyTab = Instance.new("TextButton")
+historyTab.Size = UDim2.new(1, -20, 0, 45)
+historyTab.Position = UDim2.new(0, 10, 0, 70)
+historyTab.BackgroundColor3 = colors.tabInactive
+historyTab.Text = "History"
+historyTab.TextColor3 = colors.text
+historyTab.Font = Enum.Font.GothamBold
+historyTab.TextSize = 14
+historyTab.BorderSizePixel = 0
+historyTab.Parent = rightPanel
+
+local tabCorner2 = Instance.new("UICorner")
+tabCorner2.CornerRadius = UDim.new(0, 8)
+tabCorner2.Parent = historyTab
+
+-- User info panel (at bottom of right panel)
+local userPanel = Instance.new("Frame")
+userPanel.Size = UDim2.new(1, -20, 0, 70)
+userPanel.Position = UDim2.new(0, 10, 1, -80)  -- 10px from bottom
+userPanel.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+userPanel.Parent = rightPanel
+
+local userCorner = Instance.new("UICorner")
+userCorner.CornerRadius = UDim.new(0, 8)
+userCorner.Parent = userPanel
+
+-- Avatar thumbnail (circular)
+local avatar = Instance.new("ImageLabel")
+avatar.Size = UDim2.new(0, 50, 0, 50)
+avatar.Position = UDim2.new(0, 26, 0.5, -25)
+avatar.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
+avatar.BorderSizePixel = 0
+avatar.Parent = userPanel
+
+local avatarCorner = Instance.new("UICorner")
+avatarCorner.CornerRadius = UDim.new(1, 0)  -- circle
+avatarCorner.Parent = avatar
+
+-- Load avatar thumbnail asynchronously
+task.spawn(function()
+	local userId = plr.UserId
+	local thumbType = Enum.ThumbnailType.AvatarBust
+	local thumbSize = Enum.ThumbnailSize.Size60x60
+	local content, isReady = Players:GetUserThumbnailAsync(userId, thumbType, thumbSize)
+	if isReady then
+		avatar.Image = content
+	end
 end)
 
-MinimizeButton.MouseLeave:Connect(function()
-	TweenService:Create(MinimizeButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(255, 80, 80)}):Play()
+-- Click handler for user panel (opens popup)
+local clickDetector = Instance.new("TextButton")
+clickDetector.Size = UDim2.new(1, 0, 1, 0)
+clickDetector.BackgroundTransparency = 1
+clickDetector.Text = ""
+clickDetector.Parent = userPanel
+
+-- Popup frame (initially hidden)
+local popup = Instance.new("Frame")
+popup.Size = UDim2.new(0, 300, 0, 200)
+popup.Position = UDim2.new(0.5, -150, 0.5, -100)
+popup.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+popup.BackgroundTransparency = 1
+popup.Visible = false
+popup.Parent = gui  -- place in main gui, not inside window
+
+local popupCorner = Instance.new("UICorner")
+popupCorner.CornerRadius = UDim.new(0, 10)
+popupCorner.Parent = popup
+
+-- Popup content
+local popupAvatar = Instance.new("ImageLabel")
+popupAvatar.Size = UDim2.new(0, 80, 0, 80)
+popupAvatar.Position = UDim2.new(0.5, -40, 0, 20)
+popupAvatar.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
+popupAvatar.BorderSizePixel = 0
+popupAvatar.Parent = popup
+
+local popupAvatarCorner = Instance.new("UICorner")
+popupAvatarCorner.CornerRadius = UDim.new(1, 0)
+popupAvatarCorner.Parent = popupAvatar
+
+local popupName = Instance.new("TextLabel")
+popupName.Size = UDim2.new(1, 0, 0, 30)
+popupName.Position = UDim2.new(0, 0, 0, 110)
+popupName.BackgroundTransparency = 1
+popupName.Text = plr.Name
+popupName.TextColor3 = colors.text
+popupName.Font = Enum.Font.GothamBold
+popupName.TextSize = 18
+popupName.Parent = popup
+
+-- Fake stats
+local stealsLabel = Instance.new("TextLabel")
+stealsLabel.Size = UDim2.new(1, -20, 0, 25)
+stealsLabel.Position = UDim2.new(0, 10, 0, 145)
+stealsLabel.BackgroundTransparency = 1
+stealsLabel.Text = "Total Steals: 1,234"
+stealsLabel.TextColor3 = colors.accent
+stealsLabel.Font = Enum.Font.Gotham
+stealsLabel.TextSize = 14
+stealsLabel.TextXAlignment = Enum.TextXAlignment.Left
+stealsLabel.Parent = popup
+
+local tradesLabel = Instance.new("TextLabel")
+tradesLabel.Size = UDim2.new(1, -20, 0, 25)
+tradesLabel.Position = UDim2.new(0, 10, 0, 170)
+tradesLabel.BackgroundTransparency = 1
+tradesLabel.Text = "Total Trades: 567"
+tradesLabel.TextColor3 = colors.accent
+tradesLabel.Font = Enum.Font.Gotham
+tradesLabel.TextSize = 14
+tradesLabel.TextXAlignment = Enum.TextXAlignment.Left
+tradesLabel.Parent = popup
+
+-- Close button
+local closeBtn = Instance.new("TextButton")
+closeBtn.Size = UDim2.new(0, 25, 0, 25)
+closeBtn.Position = UDim2.new(1, -30, 0, 10)
+closeBtn.BackgroundColor3 = colors.header
+closeBtn.Text = "X"
+closeBtn.TextColor3 = colors.text
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextSize = 16
+closeBtn.BorderSizePixel = 0
+closeBtn.Parent = popup
+
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0, 6)
+closeCorner.Parent = closeBtn
+
+-- Load popup avatar
+task.spawn(function()
+	local userId = plr.UserId
+	local thumbType = Enum.ThumbnailType.AvatarBust
+	local thumbSize = Enum.ThumbnailSize.Size180x180  -- larger for popup
+	local content, isReady = Players:GetUserThumbnailAsync(userId, thumbType, thumbSize)
+	if isReady then
+		popupAvatar.Image = content
+	end
 end)
 
--- Hover effect for minimized button
-MinimizedButton.MouseEnter:Connect(function()
-	TweenService:Create(MinimizedButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(60, 145, 255)}):Play()
+-- Show/hide popup with animation
+clickDetector.MouseButton1Click:Connect(function()
+	if popup.Visible then
+		TweenService:Create(popup, TweenInfo.new(0.2), {BackgroundTransparency = 1}):Play()
+		task.wait(0.2)
+		popup.Visible = false
+	else
+		popup.Visible = true
+		popup.BackgroundTransparency = 1
+		TweenService:Create(popup, TweenInfo.new(0.3), {BackgroundTransparency = 0}):Play()
+	end
 end)
 
-MinimizedButton.MouseLeave:Connect(function()
-	TweenService:Create(MinimizedButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(50, 130, 255)}):Play()
+closeBtn.MouseButton1Click:Connect(function()
+	TweenService:Create(popup, TweenInfo.new(0.2), {BackgroundTransparency = 1}):Play()
+	task.wait(0.2)
+	popup.Visible = false
 end)
 
--- Freeze Trade button click
-FreezeTradeButton.MouseButton1Click:Connect(function()
-	AddLog("──────────", Color3.fromRGB(150, 150, 150))
-	AddLog("> FREEZE ON", Color3.fromRGB(100, 255, 150))
+-- ========== TOGGLE SWITCHES (TRADE TAB) ==========
+local function createToggleSwitch(parent, name, yPos, callback)
+	local container = Instance.new("Frame")
+	container.Size = UDim2.new(1, 0, 0, 40)
+	container.Position = UDim2.new(0, 0, 0, yPos)
+	container.BackgroundTransparency = 1
+	container.Parent = parent
 
-	local freezeMessages = {
-		"Scanning...", "Trade found", "Player freezed!", "Freeze lvl 1",
-		"Locking...", "Player freezed!", "Items secured", "Freeze lvl 2",
-		"Trade locked", "Player freezed!", "Anti-cancel on", "Freeze lvl 3",
-		"Player freezed!", "Freeze max", "Transferring...", "Player freezed!",
-		"Complete!", "take all brainrots!", "Done!", "Freeze Trade completed!"
+	local label = Instance.new("TextLabel")
+	label.Size = UDim2.new(0, 200, 1, 0)
+	label.Position = UDim2.new(0, 10, 0, 0)
+	label.BackgroundTransparency = 1
+	label.Text = name
+	label.TextColor3 = colors.text
+	label.Font = Enum.Font.Gotham
+	label.TextSize = 14
+	label.TextXAlignment = Enum.TextXAlignment.Left
+	label.Parent = container
+
+	local switchBg = Instance.new("Frame")
+	switchBg.Size = UDim2.new(0, 50, 0, 24)
+	switchBg.Position = UDim2.new(1, -60, 0.5, -12)
+	switchBg.BackgroundColor3 = colors.switchOff
+	switchBg.BorderSizePixel = 0
+	switchBg.Parent = container
+
+	local bgCorner = Instance.new("UICorner")
+	bgCorner.CornerRadius = UDim.new(1, 0)
+	bgCorner.Parent = switchBg
+
+	local thumb = Instance.new("Frame")
+	thumb.Size = UDim2.new(0, 20, 0, 20)
+	thumb.Position = UDim2.new(0, 2, 0.5, -10)
+	thumb.BackgroundColor3 = colors.thumb
+	thumb.BorderSizePixel = 0
+	thumb.Parent = switchBg
+
+	local thumbCorner = Instance.new("UICorner")
+	thumbCorner.CornerRadius = UDim.new(1, 0)
+	thumbCorner.Parent = thumb
+
+	local toggled = false
+
+	local function updateVisuals()
+		if toggled then
+			switchBg.BackgroundColor3 = colors.switchOn
+			TweenService:Create(thumb, TweenInfo.new(0.2), {Position = UDim2.new(1, -22, 0.5, -10)}):Play()
+		else
+			switchBg.BackgroundColor3 = colors.switchOff
+			TweenService:Create(thumb, TweenInfo.new(0.2), {Position = UDim2.new(0, 2, 0.5, -10)}):Play()
+		end
+	end
+
+	local clickDetector = Instance.new("TextButton")
+	clickDetector.Size = UDim2.new(1, 0, 1, 0)
+	clickDetector.BackgroundTransparency = 1
+	clickDetector.Text = ""
+	clickDetector.Parent = container
+
+	clickDetector.MouseButton1Click:Connect(function()
+		toggled = not toggled
+		updateVisuals()
+		if callback then
+			callback(toggled)
+		end
+	end)
+
+	clickDetector.MouseEnter:Connect(function()
+		switchBg.BackgroundColor3 = toggled and colors.switchOn:Lerp(Color3.new(1,1,1), 0.2) or colors.switchOff:Lerp(Color3.new(1,1,1), 0.2)
+	end)
+	clickDetector.MouseLeave:Connect(function()
+		switchBg.BackgroundColor3 = toggled and colors.switchOn or colors.switchOff
+	end)
+
+	return {
+		SetState = function(state)
+			toggled = state
+			updateVisuals()
+		end,
+		GetState = function()
+			return toggled
+		end
 	}
+end
 
-	for i = 1, 20 do
-		task.spawn(function()
-			local delay
-			if i <= 8 then delay = 0.05
-			elseif i <= 14 then delay = 0.08
-			else delay = 0.12 end
+createToggleSwitch(tradeFrame, "Freeze Trade", 0)
+createToggleSwitch(tradeFrame, "Force to Ready", 50)
+createToggleSwitch(tradeFrame, "Force to Accept", 100)
+createToggleSwitch(tradeFrame, "Force to Add Brainrots", 150)
 
-			task.wait((i - 1) * delay)
+local noteLabel = Instance.new("TextLabel")
+noteLabel.Size = UDim2.new(1, -20, 0, 30)
+noteLabel.Position = UDim2.new(0, 10, 0, 195)
+noteLabel.BackgroundTransparency = 1
+noteLabel.Text = "Note: This button is still in beta; it sometimes works, sometimes doesn't."
+noteLabel.TextColor3 = colors.note
+noteLabel.Font = Enum.Font.Gotham
+noteLabel.TextSize = 11
+noteLabel.TextWrapped = true
+noteLabel.TextXAlignment = Enum.TextXAlignment.Left
+noteLabel.TextYAlignment = Enum.TextYAlignment.Top
+noteLabel.Parent = tradeFrame
 
-			local color
-			if freezeMessages[i] == "Player freezed!" then
-				color = Color3.fromRGB(255, 100, 100)
-			elseif freezeMessages[i] == "take all brainrots!" then
-				color = Color3.fromRGB(255, 255, 100)
-			else
-				color = Color3.fromRGB(math.random(150, 255), math.random(150, 255), math.random(150, 255))
-			end
+-- ========== HISTORY TAB CONTENT (LIVE FEED) ==========
+local feedFrame = Instance.new("ScrollingFrame")
+feedFrame.Size = UDim2.new(1, 0, 1, 0)
+feedFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+feedFrame.BorderSizePixel = 0
+feedFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+feedFrame.ScrollBarThickness = 6
+feedFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+feedFrame.Parent = historyFrame
 
-			AddLog("> " .. freezeMessages[i], color)
+local feedCorner = Instance.new("UICorner")
+feedCorner.CornerRadius = UDim.new(0, 8)
+feedCorner.Parent = feedFrame
 
-			if i == 20 then
-				task.wait(0.2)
-				AddLog("──────────", Color3.fromRGB(150, 150, 150))
+-- Username pool
+local usernamePool = {
+	"lavacca_247", "also77hg", "PSHUMAI", "Iskdhjdvf", "Danil073219", 
+	"Icedragon32510", "balderini1u", "leolionefc", "Ninja_iso340"
+}
+
+-- Item pool
+local itemPool = {
+	"Cigno Fulgoro", "Tacorillo Crocodillo", "Los Combinasionas", "Los Mi Gatitos",
+	"Nuclearo Dinossauro", "Esok Sekolah", "Ketupat Kepat", "La Romantic Grande",
+	"Money Money Puggy", "Bacuru and Egguru", "Dragon Cannelloni", "Hydra Dragon Cannelloni",
+	"Garama and Madundung", "Burrito Bandito", "Bananita Dolphinita", "Jolly Jolly Sahur",
+	"Popcuru and Fizzuru", "Rosetti Tualetti", "Fragrama and Chocrama", "La Supreme Combinasion",
+	"Spooky and Pumpky", "Festive 67", "Burguro And Fryuro", "Cooki and Milki",
+	"Reinito Sleighito", "Capitano Moby", "Ginger Gerat", "Ketupat Bros",
+	"La Casa Boo", "Rosey and Teddy", "Dragon Gingerini", "Skibidi Toilet",
+	"Meowl", "Strawberry Elephant"
+}
+
+-- Mutation list
+local mutationsList = {
+	"Divine", "Fire", "Matteo Hat", "Spider", "Cometstruck", "Explosive",
+	"Claws", "Taco", "Diamond", "Nyan", ":3", "Bubblegum", "Gold", "Glitched",
+	"Cursed", "26", "Chocolate", "Sombrero", "Shark Fin", "Indonesia"
+}
+
+-- Rarity types
+local rarities = {"Secret", "Epic", "Legendary"}
+
+-- Rare items that trigger a notification
+local rareItems = {"Dragon Cannelloni", "Hydra Dragon Cannelloni", "Meowl", "Strawberry Elephant"}
+
+local function getRandomUsername()
+	if math.random(1, 100) <= 70 then
+		return usernamePool[math.random(#usernamePool)]
+	else
+		return "User" .. math.random(1000, 9999)
+	end
+end
+
+local function getRandomMutations()
+	local count = math.random(0, 3)
+	if count == 0 then return "" end
+	local selected = {}
+	for i = 1, count do
+		local mut = mutationsList[math.random(#mutationsList)]
+		table.insert(selected, mut)
+	end
+	local unique = {}
+	for _, v in ipairs(selected) do
+		if not table.find(unique, v) then
+			table.insert(unique, v)
+		end
+	end
+	if #unique == 0 then return "" end
+	return "[" .. table.concat(unique, ", ") .. "] "
+end
+
+local function getRandomPrice()
+	local type = math.random(1, 10)
+	if type <= 7 then
+		local num = math.random(35, 1500)
+		return "$" .. num .. "M/s"
+	elseif type <= 9 then
+		local num = math.random(1, 9) + math.random(0, 9)/10
+		return "$" .. string.format("%.1f", num) .. "B/s"
+	else
+		local num = math.random(12, 99) * 100
+		return "$" .. (num/1000) .. "K/s"
+	end
+end
+
+local function getRandomRarity()
+	return rarities[math.random(#rarities)]
+end
+
+local function createFeedEntry(username, itemName, mutations, price, rarity)
+	local mutationText = mutations ~= "" and mutations .. " " or ""
+	local fullText = username .. " Successfully Got\n -> " .. mutationText .. itemName .. " -> " .. rarity .. " " .. price
+
+	local entry = Instance.new("TextLabel")
+	entry.Size = UDim2.new(1, -10, 0, 50)
+	entry.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+	entry.Text = fullText
+	entry.TextColor3 = colors.text
+	entry.Font = Enum.Font.Gotham
+	entry.TextSize = 11
+	entry.TextXAlignment = Enum.TextXAlignment.Left
+	entry.TextYAlignment = Enum.TextYAlignment.Top
+	entry.BorderSizePixel = 0
+	entry.Parent = feedFrame
+
+	if itemName == "Dragon Cannelloni" then
+		entry.TextColor3 = colors.gold
+	end
+
+	local entryCorner = Instance.new("UICorner")
+	entryCorner.CornerRadius = UDim.new(0, 6)
+	entryCorner.Parent = entry
+
+	return entry
+end
+
+local function addNewEntry()
+	local username = getRandomUsername()
+	local item = itemPool[math.random(#itemPool)]
+	local mutations = getRandomMutations()
+	local price = getRandomPrice()
+	local rarity = getRandomRarity()
+
+	local entry = createFeedEntry(username, item, mutations, price, rarity)
+
+	if table.find(rareItems, item) then
+		StarterGui:SetCore("SendNotification", {
+			Title = "PUBLIC HISTORY!",
+			Text = username .. " Got " .. item .. "!",
+			Duration = 10
+		})
+	end
+
+	for _, child in ipairs(feedFrame:GetChildren()) do
+		if child:IsA("TextLabel") and child ~= entry then
+			child.Position = child.Position + UDim2.new(0, 0, 0, 55)
+		end
+	end
+
+	entry.Position = UDim2.new(0, 5, 0, 5)
+
+	local children = feedFrame:GetChildren()
+	local labels = {}
+	for _, child in ipairs(children) do
+		if child:IsA("TextLabel") then
+			table.insert(labels, child)
+		end
+	end
+	if #labels > 25 then
+		table.sort(labels, function(a, b) return a.Position.Y.Offset > b.Position.Y.Offset end)
+		for i = 21, #labels do
+			labels[i]:Destroy()
+		end
+	end
+
+	local maxY = 5
+	for _, child in ipairs(feedFrame:GetChildren()) do
+		if child:IsA("TextLabel") then
+			local bottom = child.Position.Y.Offset + child.Size.Y.Offset
+			if bottom > maxY then maxY = bottom end
+		end
+	end
+	feedFrame.CanvasSize = UDim2.new(0, 0, 0, maxY + 10)
+end
+
+task.spawn(function()
+	while true do
+		task.wait(math.random(3, 6))
+		addNewEntry()
+	end
+end)
+
+for i = 1, 5 do
+	addNewEntry()
+	task.wait(0.2)
+end
+
+-- ========== TAB SWITCHING ==========
+local function setActiveTab(active)
+	if active == "TRADE" then
+		tradeTab.BackgroundColor3 = colors.tabActive
+		historyTab.BackgroundColor3 = colors.tabInactive
+		tradeFrame.Visible = true
+		historyFrame.Visible = false
+	else
+		tradeTab.BackgroundColor3 = colors.tabInactive
+		historyTab.BackgroundColor3 = colors.tabActive
+		tradeFrame.Visible = false
+		historyFrame.Visible = true
+	end
+end
+
+tradeTab.MouseButton1Click:Connect(function()
+	setActiveTab("TRADE")
+end)
+
+historyTab.MouseButton1Click:Connect(function()
+	setActiveTab("HISTORY")
+end)
+
+-- ========== ACTIVE COUNTER UPDATE ==========
+local function formatNumber(num)
+	if num >= 3000 then
+		return string.format("%.1fk", num/1000)
+	elseif num >= 2000 then
+		return string.format("%.1fk", num/1000)
+	else
+		return num .. ""
+	end
+end
+
+task.spawn(function()
+	while true do
+		task.wait(2)
+		local newCount = math.random(2100, 3000)
+		counterLabel.Text = formatNumber(newCount)
+	end
+end)
+
+-- ========== MINIMIZE ==========
+local minimized = false
+local originalHeight = 420
+
+hideBtn.MouseButton1Click:Connect(function()
+	minimized = not minimized
+	if minimized then
+		TweenService:Create(
+			window,
+			TweenInfo.new(0.3, Enum.EasingStyle.Quint),
+			{Size = UDim2.new(0, 500, 0, 50)}
+		):Play()
+		mainArea.Visible = false
+		hideBtn.Text = "+"
+	else
+		TweenService:Create(
+			window,
+			TweenInfo.new(0.4, Enum.EasingStyle.Back),
+			{Size = UDim2.new(0, 500, 0, originalHeight)}
+		):Play()
+		mainArea.Visible = true
+		hideBtn.Text = "−"
+	end
+end)
+
+-- ========== DRAG ==========
+local dragging = false
+local dragInput
+local dragStart
+local startPos
+
+header.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or 
+		input.UserInputType == Enum.UserInputType.Touch then
+		dragging = true
+		dragStart = input.Position
+		startPos = window.Position
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
 			end
 		end)
 	end
 end)
 
--- Auto-Ready button click
-AutoReadyButton.MouseButton1Click:Connect(function()
-	if isAutoReadyRunning then
-		isAutoReadyRunning = false
-		AutoReadyButton.Text = "Auto - Ready"
-		AutoReadyButton.BackgroundColor3 = Color3.fromRGB(50, 130, 255)
-		AddLog("> Stopped", Color3.fromRGB(255, 100, 100))
-		AddLog("──────────", Color3.fromRGB(150, 150, 150))
-		return
+header.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement or 
+		input.UserInputType == Enum.UserInputType.Touch then
+		dragInput = input
 	end
-	
-	isAutoReadyRunning = true
-	
-	AddLog("──────────", Color3.fromRGB(150, 150, 150))
-	AddLog("> AUTO SEQUENCE", Color3.fromRGB(200, 120, 255))
-	
-	-- First 5 seconds: Countdown
-	AddLog("> Ready in 5...", Color3.fromRGB(255, 255, 100))
-	task.wait(1)
-	AddLog("> Ready in 4...", Color3.fromRGB(255, 255, 100))
-	task.wait(1)
-	AddLog("> Ready in 3...", Color3.fromRGB(255, 255, 100))
-	task.wait(1)
-	AddLog("> Ready in 2...", Color3.fromRGB(255, 255, 100))
-	task.wait(1)
-	AddLog("> Ready in 1...", Color3.fromRGB(255, 255, 100))
-	task.wait(1)
-	AddLog("> GO!", Color3.fromRGB(100, 255, 150))
-	
-	if not isAutoReadyRunning then return end
-	
-	-- Next 5 seconds: Rapid auto-ready messages
-	AddLog("> AUTO-READY", Color3.fromRGB(200, 120, 255))
-	
-	local startTime = tick()
-	local msgIndex = 1
-	while tick() - startTime < 5 and isAutoReadyRunning do
-		local color = Color3.fromRGB(
-			math.random(150, 255),
-			math.random(150, 255),
-			math.random(150, 255)
+end)
+
+UIS.InputChanged:Connect(function(input)
+	if dragging and input == dragInput then
+		local delta = input.Position - dragStart
+		window.Position = UDim2.new(
+			startPos.X.Scale, 
+			startPos.X.Offset + delta.X,
+			startPos.Y.Scale, 
+			startPos.Y.Offset + delta.Y
 		)
-		AddLog("> " .. autoReadyRapidMessages[((msgIndex - 1) % #autoReadyRapidMessages) + 1], color)
-		msgIndex = msgIndex + 1
-		task.wait(0.2)
-	end
-	
-	if not isAutoReadyRunning then return end
-	
-	-- Next 5 seconds: Auto-accept messages
-	AddLog("> AUTO-ACCEPT", Color3.fromRGB(100, 255, 150))
-	
-	startTime = tick()
-	msgIndex = 1
-	while tick() - startTime < 5 and isAutoReadyRunning do
-		local color = Color3.fromRGB(
-			math.random(180, 255),
-			math.random(100, 200),
-			math.random(180, 255)
-		)
-		AddLog("> " .. autoAcceptMessages[((msgIndex - 1) % #autoAcceptMessages) + 1], color)
-		msgIndex = msgIndex + 1
-		task.wait(0.2)
-	end
-	
-	if not isAutoReadyRunning then return end
-	
-	-- Final message
-	AddLog("──────────", Color3.fromRGB(150, 150, 150))
-	AddLog("> Processing...!", Color3.fromRGB(255, 255, 100))
-	AddLog("> Please wait till gifted.", Color3.fromRGB(100, 255, 150))
-	AddLog("──────────", Color3.fromRGB(150, 150, 150))
-	
-	-- Reset
-	task.wait(2)
-	if isAutoReadyRunning then
-		isAutoReadyRunning = false
-		AutoReadyButton.Text = "Auto - Ready"
-		AutoReadyButton.BackgroundColor3 = Color3.fromRGB(50, 130, 255)
 	end
 end)
 
--- Initial welcome message
-AddLog("FT loaded", Color3.fromRGB(100, 255, 150))
-AddLog("Creator: Nero", Color3.fromRGB(200, 120, 255))
-
--- Button hover effects
-FreezeTradeButton.MouseEnter:Connect(function()
-	TweenService:Create(FreezeTradeButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(60, 145, 255)}):Play()
+-- Hover animation for hide button
+hideBtn.MouseEnter:Connect(function()
+	TweenService:Create(
+		hideBtn,
+		TweenInfo.new(0.15),
+		{BackgroundColor3 = Color3.fromRGB(40, 40, 50)}
+	):Play()
 end)
 
-FreezeTradeButton.MouseLeave:Connect(function()
-	TweenService:Create(FreezeTradeButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(50, 130, 255)}):Play()
+hideBtn.MouseLeave:Connect(function()
+	TweenService:Create(
+		hideBtn,
+		TweenInfo.new(0.15),
+		{BackgroundColor3 = colors.header}
+	):Play()
 end)
 
-AutoReadyButton.MouseEnter:Connect(function()
-	if not isAutoReadyRunning then
-		TweenService:Create(AutoReadyButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(60, 145, 255)}):Play()
-	end
-end)
+-- ========== ANIMATED ENTRY ==========
+window.Size = UDim2.new(0, 500, 0, 0)
+window.BackgroundTransparency = 0.5
+TweenService:Create(
+	window,
+	TweenInfo.new(0.5, Enum.EasingStyle.Back),
+	{Size = UDim2.new(0, 500, 0, 420), BackgroundTransparency = 0}
+):Play()
 
-AutoReadyButton.MouseLeave:Connect(function()
-	if not isAutoReadyRunning then
-		TweenService:Create(AutoReadyButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(50, 130, 255)}):Play()
-	end
-end)
+-- Loaded notification
+local notification = Instance.new("TextLabel")
+notification.Size = UDim2.new(0, 200, 0, 40)
+notification.Position = UDim2.new(0.5, -100, 0, 10)
+notification.BackgroundColor3 = Color3.fromRGB(16, 16, 22)
+notification.TextColor3 = colors.accent
+notification.Text = "✓ Hub Loaded!"
+notification.Font = Enum.Font.GothamBold
+notification.TextSize = 14
+notification.BackgroundTransparency = 1
+notification.TextTransparency = 1
+notification.Parent = gui
+
+local notifCorner = Instance.new("UICorner")
+notifCorner.CornerRadius = UDim.new(0, 8)
+notifCorner.Parent = notification
+
+TweenService:Create(notification, TweenInfo.new(0.3), {BackgroundTransparency = 0.1, TextTransparency = 0}):Play()
+task.wait(2)
+TweenService:Create(notification, TweenInfo.new(0.3), {BackgroundTransparency = 1, TextTransparency = 1}):Play()
+task.wait(0.3)
+notification:Destroy()
